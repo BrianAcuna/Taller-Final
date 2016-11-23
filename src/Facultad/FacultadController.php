@@ -43,7 +43,8 @@ class FacultadController implements ControllerProviderInterface
           
           'direccion'=> $a->getDireccion(),
           'descripcion'=> $a->getDescripcion(),
-          'precio'=> $a->getPrecio()
+          'precio'=> $a->getPrecio(),
+          
           );
        
         
@@ -81,8 +82,11 @@ class FacultadController implements ControllerProviderInterface
           'user_to_edit' => array(
                'direccion'=> '',
                'descripcion'=>'',
-               'precio'=> ''
-        )));
+               'precio'=> '',
+               'latitud'=>'',
+               'longitud'=>'',
+               'tipo'=>''
+       )));
 
       } else {
         // redirige el navegador a "/login"
@@ -145,19 +149,35 @@ class FacultadController implements ControllerProviderInterface
         
         $use[] = array(
           
-        'direccion'=> $request->get('direccion'),
-        'descripcion'=> $request->get('descripcion'),
-        'precio'=> $request->get('precio')
+        $dir=> $request->get('direccion'),
+        $des=> $request->get('descripcion'),
+        $pre=> $request->get('precio'),
+        $lat=> $request->get('latitud'),
+        $lon=> $request->get('longitud'),
+        $ti=> $request->get('tipo')
        
         );
-
+         $tipo= new Tipos();
+      $tipo->setNombre($ti);
+      
+$usuario= new Apartamentos();
+$usuario->setDireccion($dir);
+$usuario->setDescripcion($des);
+$usuario->setPrecio($pre);
+$usuario->setLatitud($lat);
+$usuario->setLongitud($lon);
+$usuario->setTipos($tipo);
+$usuario->save();
       } else {
         // modifica el usuario en la posición $index
          
         $use[$index] = array(
         'direccion'=> $request->get('direccion'),
         'descripcion'=> $request->get('descripcion'),
-        'precio'=> $request->get('precio')
+        'precio'=> $request->get('precio'),
+        'latitud'=> $request->get('latitud'),
+        'longitud'=> $request->get('longitud'),
+        'tipo'=> $request->get('tipo')
         
         );
         

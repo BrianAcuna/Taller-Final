@@ -346,7 +346,7 @@ abstract class FavoritosQuery extends ModelCriteria
      *
      * @return $this|ChildFavoritosQuery The current query, for fluid interface
      */
-    public function joinApartamentos($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinApartamentos($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Apartamentos');
@@ -381,7 +381,7 @@ abstract class FavoritosQuery extends ModelCriteria
      *
      * @return \ApartamentosQuery A secondary query class using the current class as primary query
      */
-    public function useApartamentosQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useApartamentosQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinApartamentos($relationAlias, $joinType)

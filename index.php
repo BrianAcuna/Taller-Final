@@ -26,6 +26,7 @@ $app->get('/', function() use($app) {
 // =============================
 
 $app->mount('/login', new App\Login\LoginController());
+$app->mount('/Registro', new App\Registro\RegistroController());
 $app->mount('/users', new App\Users\UsersController());
 $app->mount('/Facultad',new App\Facultad\FacultadController());
 

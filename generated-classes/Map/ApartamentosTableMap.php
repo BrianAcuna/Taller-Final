@@ -159,15 +159,15 @@ class ApartamentosTableMap extends TableMap
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Apartamentos');
         $this->setPackage('');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('direccion', 'Direccion', 'VARCHAR', true, 30, null);
-        $this->addColumn('descripcion', 'Descripcion', 'VARCHAR', true, 30, null);
+        $this->addColumn('descripcion', 'Descripcion', 'VARCHAR', true, 100, null);
         $this->addColumn('precio', 'Precio', 'INTEGER', true, null, null);
         $this->addColumn('latitud', 'Latitud', 'VARCHAR', true, 30, null);
         $this->addColumn('longitud', 'Longitud', 'VARCHAR', true, 30, null);
-        $this->addForeignKey('id_comentario', 'IdComentario', 'INTEGER', 'favoritos', 'id', true, null, null);
+        $this->addForeignKey('id_comentario', 'IdComentario', 'INTEGER', 'favoritos', 'id', false, null, null);
         $this->addForeignKey('id_tipo', 'IdTipo', 'INTEGER', 'tipos', 'id', true, null, null);
     } // initialize()
 
@@ -176,17 +176,17 @@ class ApartamentosTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Favoritos', '\\Favoritos', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':id_comentario',
-    1 => ':id',
-  ),
-), null, null, null, false);
         $this->addRelation('Tipos', '\\Tipos', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':id_tipo',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('Favoritos', '\\Favoritos', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':id_comentario',
     1 => ':id',
   ),
 ), null, null, null, false);
@@ -447,6 +447,10 @@ class ApartamentosTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from Apartamentos object
+        }
+
+        if ($criteria->containsKey(ApartamentosTableMap::COL_ID) && $criteria->keyContainsValue(ApartamentosTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ApartamentosTableMap::COL_ID.')');
         }
 
 

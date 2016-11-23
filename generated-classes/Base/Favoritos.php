@@ -607,9 +607,10 @@ abstract class Favoritos implements ActiveRecordInterface
 
             if ($this->apartamentossScheduledForDeletion !== null) {
                 if (!$this->apartamentossScheduledForDeletion->isEmpty()) {
-                    \ApartamentosQuery::create()
-                        ->filterByPrimaryKeys($this->apartamentossScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
+                    foreach ($this->apartamentossScheduledForDeletion as $apartamentos) {
+                        // need to save related object because we set the relation to null
+                        $apartamentos->save($con);
+                    }
                     $this->apartamentossScheduledForDeletion = null;
                 }
             }
@@ -1275,7 +1276,7 @@ abstract class Favoritos implements ActiveRecordInterface
                 $this->apartamentossScheduledForDeletion = clone $this->collApartamentoss;
                 $this->apartamentossScheduledForDeletion->clear();
             }
-            $this->apartamentossScheduledForDeletion[]= clone $apartamentos;
+            $this->apartamentossScheduledForDeletion[]= $apartamentos;
             $apartamentos->setFavoritos(null);
         }
 

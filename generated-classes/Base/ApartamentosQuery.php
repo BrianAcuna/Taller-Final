@@ -46,16 +46,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApartamentosQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildApartamentosQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildApartamentosQuery leftJoinFavoritos($relationAlias = null) Adds a LEFT JOIN clause to the query using the Favoritos relation
- * @method     ChildApartamentosQuery rightJoinFavoritos($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Favoritos relation
- * @method     ChildApartamentosQuery innerJoinFavoritos($relationAlias = null) Adds a INNER JOIN clause to the query using the Favoritos relation
- *
- * @method     ChildApartamentosQuery joinWithFavoritos($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Favoritos relation
- *
- * @method     ChildApartamentosQuery leftJoinWithFavoritos() Adds a LEFT JOIN clause and with to the query using the Favoritos relation
- * @method     ChildApartamentosQuery rightJoinWithFavoritos() Adds a RIGHT JOIN clause and with to the query using the Favoritos relation
- * @method     ChildApartamentosQuery innerJoinWithFavoritos() Adds a INNER JOIN clause and with to the query using the Favoritos relation
- *
  * @method     ChildApartamentosQuery leftJoinTipos($relationAlias = null) Adds a LEFT JOIN clause to the query using the Tipos relation
  * @method     ChildApartamentosQuery rightJoinTipos($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Tipos relation
  * @method     ChildApartamentosQuery innerJoinTipos($relationAlias = null) Adds a INNER JOIN clause to the query using the Tipos relation
@@ -66,7 +56,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildApartamentosQuery rightJoinWithTipos() Adds a RIGHT JOIN clause and with to the query using the Tipos relation
  * @method     ChildApartamentosQuery innerJoinWithTipos() Adds a INNER JOIN clause and with to the query using the Tipos relation
  *
- * @method     \FavoritosQuery|\TiposQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildApartamentosQuery leftJoinFavoritos($relationAlias = null) Adds a LEFT JOIN clause to the query using the Favoritos relation
+ * @method     ChildApartamentosQuery rightJoinFavoritos($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Favoritos relation
+ * @method     ChildApartamentosQuery innerJoinFavoritos($relationAlias = null) Adds a INNER JOIN clause to the query using the Favoritos relation
+ *
+ * @method     ChildApartamentosQuery joinWithFavoritos($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Favoritos relation
+ *
+ * @method     ChildApartamentosQuery leftJoinWithFavoritos() Adds a LEFT JOIN clause and with to the query using the Favoritos relation
+ * @method     ChildApartamentosQuery rightJoinWithFavoritos() Adds a RIGHT JOIN clause and with to the query using the Favoritos relation
+ * @method     ChildApartamentosQuery innerJoinWithFavoritos() Adds a INNER JOIN clause and with to the query using the Favoritos relation
+ *
+ * @method     \TiposQuery|\FavoritosQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildApartamentos findOne(ConnectionInterface $con = null) Return the first ChildApartamentos matching the query
  * @method     ChildApartamentos findOneOrCreate(ConnectionInterface $con = null) Return the first ChildApartamentos matching the query, or a new ChildApartamentos object populated from the query conditions when no match is found
@@ -558,83 +558,6 @@ abstract class ApartamentosQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Favoritos object
-     *
-     * @param \Favoritos|ObjectCollection $favoritos The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildApartamentosQuery The current query, for fluid interface
-     */
-    public function filterByFavoritos($favoritos, $comparison = null)
-    {
-        if ($favoritos instanceof \Favoritos) {
-            return $this
-                ->addUsingAlias(ApartamentosTableMap::COL_ID_COMENTARIO, $favoritos->getId(), $comparison);
-        } elseif ($favoritos instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(ApartamentosTableMap::COL_ID_COMENTARIO, $favoritos->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByFavoritos() only accepts arguments of type \Favoritos or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Favoritos relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildApartamentosQuery The current query, for fluid interface
-     */
-    public function joinFavoritos($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Favoritos');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Favoritos');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Favoritos relation Favoritos object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \FavoritosQuery A secondary query class using the current class as primary query
-     */
-    public function useFavoritosQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinFavoritos($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Favoritos', '\FavoritosQuery');
-    }
-
-    /**
      * Filter the query by a related \Tipos object
      *
      * @param \Tipos|ObjectCollection $tipos The related object(s) to use as filter
@@ -709,6 +632,83 @@ abstract class ApartamentosQuery extends ModelCriteria
         return $this
             ->joinTipos($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Tipos', '\TiposQuery');
+    }
+
+    /**
+     * Filter the query by a related \Favoritos object
+     *
+     * @param \Favoritos|ObjectCollection $favoritos The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildApartamentosQuery The current query, for fluid interface
+     */
+    public function filterByFavoritos($favoritos, $comparison = null)
+    {
+        if ($favoritos instanceof \Favoritos) {
+            return $this
+                ->addUsingAlias(ApartamentosTableMap::COL_ID_COMENTARIO, $favoritos->getId(), $comparison);
+        } elseif ($favoritos instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(ApartamentosTableMap::COL_ID_COMENTARIO, $favoritos->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByFavoritos() only accepts arguments of type \Favoritos or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Favoritos relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildApartamentosQuery The current query, for fluid interface
+     */
+    public function joinFavoritos($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Favoritos');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Favoritos');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Favoritos relation Favoritos object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \FavoritosQuery A secondary query class using the current class as primary query
+     */
+    public function useFavoritosQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinFavoritos($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Favoritos', '\FavoritosQuery');
     }
 
     /**

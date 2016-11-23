@@ -129,7 +129,7 @@ class TiposTableMap extends TableMap
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Tipos');
         $this->setPackage('');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('nombre', 'Nombre', 'VARCHAR', true, 20, null);
@@ -392,6 +392,10 @@ class TiposTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from Tipos object
+        }
+
+        if ($criteria->containsKey(TiposTableMap::COL_ID) && $criteria->keyContainsValue(TiposTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.TiposTableMap::COL_ID.')');
         }
 
 

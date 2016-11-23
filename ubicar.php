@@ -1,16 +1,14 @@
 <?php
-
 require_once "./vendor/autoload.php";
-
 // "willdurand/geocoder": "^3.2"
+
+
 $geocoderAdapter  = new \Ivory\HttpAdapter\CurlHttpAdapter();
 $geocoder = new \Geocoder\ProviderAggregator();
 $geocoder->registerProvider(new \Geocoder\Provider\GoogleMaps($geocoderAdapter));
-
-$busqueda = isset($_GET['busqueda']) ? $_GET['busqueda'] : '';
-
+$busqueda = isset($_GET['latitud']) ? $_GET['latitud'] : '';
+$busquedados = isset($_GET['longitud']) ? $_GET['longitud'] : '';
 $obj = $geocoder->geocode($busqueda);
-
 
 
 ?>
@@ -27,7 +25,8 @@ $obj = $geocoder->geocode($busqueda);
 <div id = "formulario">
 <form method = "GET">
 
-   Nombre: <input type = "text" id = "busqueda" name = "busqueda"  size = 40>
+   Latitud: <input type = "text" id = "latitud" name = "latitud"  size = 40>
+   Longitud: <input type = "text" id = "longitud" name = "longitud"  size = 40>
 <br/>
 <button id = "buscar" name = "buscar">
 Buscar</button>
@@ -41,21 +40,14 @@ Buscar</button>
 
 
 <script>
-
-
 // inicializa el mapa
 function initMap() {
-
-
   // define una coordenada (latitud, longitud)
   <?php
-
   foreach ($obj as $address) { ?>
-
-
   var myLatLng = {lat: <?= $address -> getLatitude() ?>,
                   lng: <?= $address -> getLongitude() ?>};
-
+                  
   <?php
 }
 ?>
@@ -68,12 +60,9 @@ function initMap() {
       zoom: 18              // nivel de zoom
     }
   );
-
-
 <?php
 foreach ($obj as $address)
 {
-
 ?>
   // crea un marcador sobre el mapa
   var marker = new google.maps.Marker({
@@ -86,13 +75,9 @@ foreach ($obj as $address)
 }
 ?>
 }
-
-
 // define un manejador de eventos
 // al cargar la página, llama initMap()
 google.maps.event.addDomListener(window, 'load', initMap);
-
 </script>
-
 </body>
 </html>

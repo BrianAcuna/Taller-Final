@@ -120,14 +120,14 @@ abstract class Apartamentos implements ActiveRecordInterface
     protected $id_tipo;
 
     /**
-     * @var        ChildFavoritos
-     */
-    protected $aFavoritos;
-
-    /**
      * @var        ChildTipos
      */
     protected $aTipos;
+
+    /**
+     * @var        ChildFavoritos
+     */
+    protected $aFavoritos;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -744,8 +744,8 @@ abstract class Apartamentos implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aFavoritos = null;
             $this->aTipos = null;
+            $this->aFavoritos = null;
         } // if (deep)
     }
 
@@ -850,18 +850,18 @@ abstract class Apartamentos implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aFavoritos !== null) {
-                if ($this->aFavoritos->isModified() || $this->aFavoritos->isNew()) {
-                    $affectedRows += $this->aFavoritos->save($con);
-                }
-                $this->setFavoritos($this->aFavoritos);
-            }
-
             if ($this->aTipos !== null) {
                 if ($this->aTipos->isModified() || $this->aTipos->isNew()) {
                     $affectedRows += $this->aTipos->save($con);
                 }
                 $this->setTipos($this->aTipos);
+            }
+
+            if ($this->aFavoritos !== null) {
+                if ($this->aFavoritos->isModified() || $this->aFavoritos->isNew()) {
+                    $affectedRows += $this->aFavoritos->save($con);
+                }
+                $this->setFavoritos($this->aFavoritos);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -895,6 +895,10 @@ abstract class Apartamentos implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[ApartamentosTableMap::COL_ID] = true;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ApartamentosTableMap::COL_ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ApartamentosTableMap::COL_ID)) {
@@ -963,6 +967,13 @@ abstract class Apartamentos implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', 0, $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1080,21 +1091,6 @@ abstract class Apartamentos implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aFavoritos) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'favoritos';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'favoritos';
-                        break;
-                    default:
-                        $key = 'Favoritos';
-                }
-
-                $result[$key] = $this->aFavoritos->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aTipos) {
 
                 switch ($keyType) {
@@ -1109,6 +1105,21 @@ abstract class Apartamentos implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aTipos->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aFavoritos) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'favoritos';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'favoritos';
+                        break;
+                    default:
+                        $key = 'Favoritos';
+                }
+
+                $result[$key] = $this->aFavoritos->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1369,7 +1380,6 @@ abstract class Apartamentos implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
         $copyObj->setDireccion($this->getDireccion());
         $copyObj->setDescripcion($this->getDescripcion());
         $copyObj->setPrecio($this->getPrecio());
@@ -1379,6 +1389,7 @@ abstract class Apartamentos implements ActiveRecordInterface
         $copyObj->setIdTipo($this->getIdTipo());
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1402,57 +1413,6 @@ abstract class Apartamentos implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
-    }
-
-    /**
-     * Declares an association between this object and a ChildFavoritos object.
-     *
-     * @param  ChildFavoritos $v
-     * @return $this|\Apartamentos The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFavoritos(ChildFavoritos $v = null)
-    {
-        if ($v === null) {
-            $this->setIdComentario(NULL);
-        } else {
-            $this->setIdComentario($v->getId());
-        }
-
-        $this->aFavoritos = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildFavoritos object, it will not be re-added.
-        if ($v !== null) {
-            $v->addApartamentos($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildFavoritos object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildFavoritos The associated ChildFavoritos object.
-     * @throws PropelException
-     */
-    public function getFavoritos(ConnectionInterface $con = null)
-    {
-        if ($this->aFavoritos === null && ($this->id_comentario !== null)) {
-            $this->aFavoritos = ChildFavoritosQuery::create()->findPk($this->id_comentario, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aFavoritos->addApartamentoss($this);
-             */
-        }
-
-        return $this->aFavoritos;
     }
 
     /**
@@ -1507,17 +1467,68 @@ abstract class Apartamentos implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildFavoritos object.
+     *
+     * @param  ChildFavoritos $v
+     * @return $this|\Apartamentos The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setFavoritos(ChildFavoritos $v = null)
+    {
+        if ($v === null) {
+            $this->setIdComentario(NULL);
+        } else {
+            $this->setIdComentario($v->getId());
+        }
+
+        $this->aFavoritos = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildFavoritos object, it will not be re-added.
+        if ($v !== null) {
+            $v->addApartamentos($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildFavoritos object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildFavoritos The associated ChildFavoritos object.
+     * @throws PropelException
+     */
+    public function getFavoritos(ConnectionInterface $con = null)
+    {
+        if ($this->aFavoritos === null && ($this->id_comentario !== null)) {
+            $this->aFavoritos = ChildFavoritosQuery::create()->findPk($this->id_comentario, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFavoritos->addApartamentoss($this);
+             */
+        }
+
+        return $this->aFavoritos;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
-        if (null !== $this->aFavoritos) {
-            $this->aFavoritos->removeApartamentos($this);
-        }
         if (null !== $this->aTipos) {
             $this->aTipos->removeApartamentos($this);
+        }
+        if (null !== $this->aFavoritos) {
+            $this->aFavoritos->removeApartamentos($this);
         }
         $this->id = null;
         $this->direccion = null;
@@ -1547,8 +1558,8 @@ abstract class Apartamentos implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aFavoritos = null;
         $this->aTipos = null;
+        $this->aFavoritos = null;
     }
 
     /**
