@@ -1,0 +1,24 @@
+{
+    "propel": {
+        "database": {
+            "connections": {
+                "inmobiliaria": {
+                    "adapter": "mysql",
+                    "classname": "Propel\\Runtime\\Connection\\ConnectionWrapper",
+                    "dsn": "mysql:host=localhost;dbname=inmobiliaria",
+                    "user": "brianacuna",
+                    "password": "",
+                    "attributes": []
+                }
+            }
+        },
+        "runtime": {
+            "defaultConnection": "inmobiliaria",
+            "connections": ["inmobiliaria"]
+        },
+        "generator": {
+            "defaultConnection": "inmobiliaria",
+            "connections": ["inmobiliaria"]
+        }
+    }
+}
